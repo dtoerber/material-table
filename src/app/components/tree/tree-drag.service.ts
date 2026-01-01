@@ -23,7 +23,6 @@ export class TreeDragService {
   };
 
   private expandedNodeNames = new Set<string>();
-  private nodeToExpandAfterDrop: string | null = null;
   private selectedNodeName: string | null = null;
 
   /**
@@ -136,11 +135,6 @@ export class TreeDragService {
     // Save expanded state before drop
     if (tree) {
       this.saveExpandedState(tree, dataSource);
-    }
-
-    // If dropping inside a node, mark it to be expanded after drop
-    if (dropPosition === 'inside') {
-      this.nodeToExpandAfterDrop = dropTarget.name;
     }
 
     // Mark the dragged node as selected
@@ -264,7 +258,6 @@ export class TreeDragService {
       dropTarget: null,
       dropPosition: null,
     };
-    this.nodeToExpandAfterDrop = null;
   }
 
   /**
@@ -322,10 +315,6 @@ export class TreeDragService {
         if (this.expandedNodeNames.has(node.name)) {
           tree.expand(node);
         }
-        // Expand the node that was dropped into
-        if (this.nodeToExpandAfterDrop && node.name === this.nodeToExpandAfterDrop) {
-          tree.expand(node);
-        }
         if (node.children) {
           expandNodes(node.children);
         }
@@ -333,9 +322,6 @@ export class TreeDragService {
     };
 
     expandNodes(dataSource);
-
-    // Clear the expand flag after use
-    this.nodeToExpandAfterDrop = null;
   }
 
   /**

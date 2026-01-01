@@ -74,7 +74,8 @@ export class TreeComponent implements AfterViewInit {
         font-weight: bold;
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       `;
-      dragIcon.textContent = node.type === 'folder' ? '📁' : '📄';
+      // Use different icons for parent nodes (with children) vs leaf nodes (no children)
+      dragIcon.textContent = (node.children && node.children.length > 0) ? '📁' : '📄';
       document.body.appendChild(dragIcon);
 
       event.dataTransfer.setDragImage(dragIcon, 20, 20);
@@ -137,10 +138,10 @@ export class TreeComponent implements AfterViewInit {
       // Perform the drop operation at root level
       this.dataSource = this.dragService.dropAtRoot(this.dataSource, this.tree);
 
-      // Restore expanded state after a short delay
-      setTimeout(() => {
+      // Restore expanded state after the next animation frame to allow the tree to render
+      requestAnimationFrame(() => {
         this.dragService.restoreExpandedState(this.tree, this.dataSource);
-      }, 0);
+      });
     }
   }
 
@@ -161,10 +162,10 @@ export class TreeComponent implements AfterViewInit {
     // Perform the drop operation (service handles expansion state)
     this.dataSource = this.dragService.drop(this.dataSource, this.tree);
 
-    // Restore expanded state after a short delay to allow the tree to render
-    setTimeout(() => {
+    // Restore expanded state after the next animation frame to allow the tree to render
+    requestAnimationFrame(() => {
       this.dragService.restoreExpandedState(this.tree, this.dataSource);
-    }, 0);
+    });
   }
 
   /**
