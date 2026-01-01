@@ -52,37 +52,3 @@ export const files: FileNode[] = [
     ],
   },
 ];
-
-export const EXAMPLE_DATA: FileNode[] = [
-  {
-    name: 'Fruit',
-    type: 'folder',
-    children: [
-      { name: 'Apple', type: 'file' },
-      { name: 'Banana', type: 'file' },
-      { name: 'Fruit loops', type: 'file' },
-    ],
-  },
-  {
-    name: 'Vegetables',
-    type: 'folder',
-    children: [
-      {
-        name: 'Green',
-        type: 'folder',
-        children: [
-          { name: 'Broccoli', type: 'file' },
-          { name: 'Brussels sprouts', type: 'file' },
-        ],
-      },
-      {
-        name: 'Orange',
-        type: 'folder',
-        children: [
-          { name: 'Pumpkins', type: 'file' },
-          { name: 'Carrots', type: 'file' },
-        ],
-      },
-    ],
-  },
-];

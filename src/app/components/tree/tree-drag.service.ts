@@ -7,7 +7,7 @@ export interface DragState {
   draggedNodeParent: FileNode | null;
   draggedNodeIndex: number;
   dropTarget: FileNode | null;
-  dropPosition: 'before' | 'after' | 'inside' | null;
+  dropPosition: 'before' | 'after' | 'inside' | 'root' | null;
 }
 
 @Injectable({
@@ -47,7 +47,7 @@ export class TreeDragService {
   /**
    * Set the drop target and position
    */
-  setDropTarget(target: FileNode | null, position: 'before' | 'after' | 'inside' | null): void {
+  setDropTarget(target: FileNode | null, position: 'before' | 'after' | 'inside' | 'root' | null): void {
     this.dragState.dropTarget = target;
     this.dragState.dropPosition = position;
   }
@@ -69,8 +69,17 @@ export class TreeDragService {
   /**
    * Check if a drop is valid (prevent dropping a parent into its own child)
    */
-  canDrop(targetNode: FileNode | null, position: 'before' | 'after' | 'inside' | null): boolean {
-    if (!this.dragState.draggedNode || !targetNode) {
+  canDrop(targetNode: FileNode | null, position: 'before' | 'after' | 'inside' | 'root' | null): boolean {
+    if (!this.dragState.draggedNode) {
+      return false;
+    }
+
+    // Root position is always valid if we have a dragged node
+    if (position === 'root') {
+      return true;
+    }
+
+    if (!targetNode) {
       return false;
     }
 
@@ -270,9 +279,13 @@ export class TreeDragService {
     const mouseY = event.clientY - rect.top;
     const height = rect.height;
 
-    // If the target is a folder and mouse is in the middle third, drop inside
-    if (targetNode.children && mouseY > height * 0.33 && mouseY < height * 0.67) {
-      return 'inside';
+    // If the target is a folder (has children or is of type folder), use a generous 'inside' zone
+    // This makes it easier to drop into folders, especially closed ones
+    if (targetNode.type === 'folder' || targetNode.children) {
+      // Use top/bottom 20% for before/after, middle 60% for inside
+      if (mouseY > height * 0.2 && mouseY < height * 0.8) {
+        return 'inside';
+      }
     }
 
     // Otherwise, drop before or after based on mouse position
@@ -365,6 +378,60 @@ export class TreeDragService {
    */
   setSelected(node: FileNode | null): void {
     this.selectedNodeName = node ? node.name : null;
+  }
+
+  /**
+   * Drop at root level
+   */
+  dropAtRoot(dataSource: FileNode[], tree?: MatTree<FileNode>): FileNode[] {
+    const { draggedNode, draggedNodeParent } = this.dragState;
+
+    if (!draggedNode) {
+      this.endDrag();
+      return dataSource;
+    }
+
+    // Save expanded state before drop
+    if (tree) {
+      this.saveExpandedState(tree, dataSource);
+    }
+
+    // Mark the dragged node as selected
+    this.selectedNodeName = draggedNode.name;
+
+    // Create a deep copy of the data source
+    const newDataSource = JSON.parse(JSON.stringify(dataSource)) as FileNode[];
+
+    // Find the dragged node in the new data source
+    const { node: newDraggedNode, parent: newDraggedParent } = this.findNodeAndParent(
+      newDataSource,
+      draggedNode.name,
+      draggedNodeParent?.name
+    );
+
+    if (!newDraggedNode) {
+      this.endDrag();
+      return dataSource;
+    }
+
+    // Remove the dragged node from its current location
+    if (newDraggedParent && newDraggedParent.children) {
+      const index = newDraggedParent.children.findIndex((n) => n.name === newDraggedNode.name);
+      if (index !== -1) {
+        newDraggedParent.children.splice(index, 1);
+      }
+    } else {
+      const index = newDataSource.findIndex((n) => n.name === newDraggedNode.name);
+      if (index !== -1) {
+        newDataSource.splice(index, 1);
+      }
+    }
+
+    // Add to root level
+    newDataSource.push(newDraggedNode);
+
+    this.endDrag();
+    return newDataSource;
   }
 
   /**

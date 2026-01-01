@@ -1,9 +1,9 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTree, MatTreeModule } from '@angular/material/tree';
-import { EXAMPLE_DATA, FileNode, files } from './example-data';
+import { FileNode, files } from './example-data';
 import { TreeDragService } from './tree-drag.service';
 
 @Component({
@@ -104,6 +104,43 @@ export class TreeComponent implements AfterViewInit {
       if (event.dataTransfer) {
         event.dataTransfer.dropEffect = 'none';
       }
+    }
+  }
+
+  /**
+   * Handle drag over event for root drop zone
+   */
+  onRootDragOver(event: DragEvent): void {
+    // Only handle if not over a specific node
+    if ((event.target as HTMLElement).classList.contains('container')) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (this.dragService.getDragState().draggedNode) {
+        this.dragService.setDropTarget(null, 'root');
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = 'move';
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle drop event for root drop zone
+   */
+  onRootDrop(event: DragEvent): void {
+    // Only handle if dropping on container itself, not on a node
+    if ((event.target as HTMLElement).classList.contains('container')) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Perform the drop operation at root level
+      this.dataSource = this.dragService.dropAtRoot(this.dataSource, this.tree);
+
+      // Restore expanded state after a short delay
+      setTimeout(() => {
+        this.dragService.restoreExpandedState(this.tree, this.dataSource);
+      }, 0);
     }
   }
 
