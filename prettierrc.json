@@ -1,0 +1,17 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "endOfLine": "auto",
+  "bracketSameLine": true,
+  "overrides": [
+    {
+      "files": ["*.html", "*.ts"],
+      "options": {
+        "printWidth": 180
+      }
+    }
+  ]
+}
