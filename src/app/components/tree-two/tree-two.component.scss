@@ -3,12 +3,12 @@
   min-height: 400px;
   padding: 8px;
   border-radius: 4px;
-  border: 2px solid green;
+  border: 2px solid blue;
   transition: background-color 0.2s ease;
 
   &.drop-target-root {
-    background-color: rgba(0, 128, 0, 0.1);
-    border-color: green;
+    background-color: rgba(0, 0, 255, 0.1);
+    border-color: blue;
     border-style: dashed;
   }
 }
@@ -32,38 +32,50 @@ mat-tree-node {
   }
 
   &.selected {
-    background-color: rgba(0, 128, 0, 0.15);
+    background-color: rgba(0, 0, 255, 0.15);
     font-weight: 500;
   }
 
-  // Drop before indicator
-  &.drop-before::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: green;
-    z-index: 10;
+  // Drop before indicator - expands the drop area
+  &.drop-before {
+    margin-top: 16px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: blue;
+      border-radius: 2px;
+      z-index: 10;
+      box-shadow: 0 0 4px rgba(0, 0, 255, 0.5);
+    }
   }
 
-  // Drop after indicator
-  &.drop-after::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: green;
-    z-index: 10;
+  // Drop after indicator - expands the drop area
+  &.drop-after {
+    margin-bottom: 16px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: blue;
+      border-radius: 2px;
+      z-index: 10;
+      box-shadow: 0 0 4px rgba(0, 0, 255, 0.5);
+    }
   }
 
   // Drop inside indicator
   &.drop-inside {
-    background-color: rgba(0, 128, 0, 0.2);
-    border-color: green;
+    background-color: rgba(0, 0, 255, 0.2);
+    border-color: blue;
     border-style: dashed;
   }
 }
