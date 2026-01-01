@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatTree } from '@angular/material/tree';
-import { FileNode } from './example-data';
+import { FileNode } from '../data/example-data';
 
 export interface DragState {
   draggedNode: FileNode | null;
@@ -28,12 +28,7 @@ export class TreeDragService {
   /**
    * Start dragging a node
    */
-  startDrag(
-    node: FileNode,
-    parent: FileNode | null,
-    index: number,
-    dataSource: FileNode[]
-  ): void {
+  startDrag(node: FileNode, parent: FileNode | null, index: number, dataSource: FileNode[]): void {
     this.dragState = {
       draggedNode: node,
       draggedNodeParent: parent,
@@ -46,7 +41,10 @@ export class TreeDragService {
   /**
    * Set the drop target and position
    */
-  setDropTarget(target: FileNode | null, position: 'before' | 'after' | 'inside' | 'root' | null): void {
+  setDropTarget(
+    target: FileNode | null,
+    position: 'before' | 'after' | 'inside' | 'root' | null,
+  ): void {
     this.dragState.dropTarget = target;
     this.dragState.dropPosition = position;
   }
@@ -68,7 +66,10 @@ export class TreeDragService {
   /**
    * Check if a drop is valid (prevent dropping a parent into its own child)
    */
-  canDrop(targetNode: FileNode | null, position: 'before' | 'after' | 'inside' | 'root' | null): boolean {
+  canDrop(
+    targetNode: FileNode | null,
+    position: 'before' | 'after' | 'inside' | 'root' | null,
+  ): boolean {
     if (!this.dragState.draggedNode) {
       return false;
     }
@@ -147,11 +148,11 @@ export class TreeDragService {
     const { node: newDraggedNode, parent: newDraggedParent } = this.findNodeAndParent(
       newDataSource,
       draggedNode.name,
-      draggedNodeParent?.name
+      draggedNodeParent?.name,
     );
     const { node: newDropTarget, parent: newDropTargetParent } = this.findNodeAndParent(
       newDataSource,
-      dropTarget.name
+      dropTarget.name,
     );
 
     if (!newDraggedNode || !newDropTarget) {
@@ -201,7 +202,7 @@ export class TreeDragService {
   private findNodeAndParent(
     nodes: FileNode[],
     nodeName: string,
-    parentName?: string
+    parentName?: string,
   ): { node: FileNode | null; parent: FileNode | null } {
     for (const node of nodes) {
       if (node.name === nodeName) {
@@ -225,7 +226,7 @@ export class TreeDragService {
   private findNodeInChildren(
     parent: FileNode,
     nodeName: string,
-    parentName?: string
+    parentName?: string,
   ): { node: FileNode | null; parent: FileNode | null } {
     if (!parent.children) {
       return { node: null, parent: null };
@@ -266,7 +267,7 @@ export class TreeDragService {
   calculateDropPosition(
     event: DragEvent,
     targetElement: HTMLElement,
-    targetNode: FileNode
+    targetNode: FileNode,
   ): 'before' | 'after' | 'inside' {
     const rect = targetElement.getBoundingClientRect();
     const mouseY = event.clientY - rect.top;
@@ -392,7 +393,7 @@ export class TreeDragService {
     const { node: newDraggedNode, parent: newDraggedParent } = this.findNodeAndParent(
       newDataSource,
       draggedNode.name,
-      draggedNodeParent?.name
+      draggedNodeParent?.name,
     );
 
     if (!newDraggedNode) {

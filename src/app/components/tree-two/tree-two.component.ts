@@ -3,16 +3,16 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTree, MatTreeModule } from '@angular/material/tree';
-import { TreeDragService } from '../../services/tree-drag.service';
 import { FileNode, files } from '../../data/example-data';
+import { TreeDragService } from '../../services/tree-drag.service';
 
 @Component({
-  selector: 'app-tree',
-  templateUrl: './tree.component.html',
-  styleUrl: './tree.component.scss',
+  selector: 'app-tree-two',
+  templateUrl: './tree-two.component.html',
+  styleUrl: './tree-two.component.scss',
   imports: [CommonModule, MatTreeModule, MatButtonModule, MatIconModule],
 })
-export class TreeComponent implements AfterViewInit {
+export class TreeTwoComponent implements AfterViewInit {
   @ViewChild('tree', { static: false }) tree!: MatTree<FileNode>;
 
   /** The data source for the tree */

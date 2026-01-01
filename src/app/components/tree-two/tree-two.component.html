@@ -1,0 +1,58 @@
+<div
+  class="container"
+  [ngClass]="{
+    'drop-target-root':
+      dragService.getDragState().dropTarget === null &&
+      dragService.getDragState().draggedNode !== null,
+  }"
+  (dragover)="onRootDragOver($event)"
+  (drop)="onRootDrop($event)"
+>
+  <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
+    <!-- This is the tree node template for leaf nodes -->
+    <mat-tree-node
+      *matTreeNodeDef="let node"
+      matTreeNodePadding
+      #nodeElement
+      draggable="true"
+      [ngClass]="getDragClasses(node)"
+      (click)="onNodeClick($event, node)"
+      (dragstart)="
+        onDragStart($event, node, getParentNode(node), getNodeIndex(node, getParentNode(node)))
+      "
+      (dragover)="onDragOver($event, node, nodeElement)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (dragend)="onDragEnd($event)"
+    >
+      <!-- use a disabled button to provide padding for tree leaf -->
+      <button matIconButton disabled></button>
+      {{ node.name }}
+    </mat-tree-node>
+    <!-- This is the tree node template for expandable nodes -->
+    <mat-tree-node
+      *matTreeNodeDef="let node; when: hasChild"
+      matTreeNodePadding
+      matTreeNodeToggle
+      [cdkTreeNodeTypeaheadLabel]="node.name"
+      #nodeElement
+      draggable="true"
+      [ngClass]="getDragClasses(node)"
+      (click)="onNodeClick($event, node)"
+      (dragstart)="
+        onDragStart($event, node, getParentNode(node), getNodeIndex(node, getParentNode(node)))
+      "
+      (dragover)="onDragOver($event, node, nodeElement)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (dragend)="onDragEnd($event)"
+    >
+      <button matIconButton matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+        <mat-icon class="mat-icon-rtl-mirror">
+          {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+        </mat-icon>
+      </button>
+      {{ node.name }}
+    </mat-tree-node>
+  </mat-tree>
+</div>
