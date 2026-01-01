@@ -19,5 +19,5 @@ export class TreeComponent {
   childrenAccessor = (node: FileNode) => node.children ?? [];
 
   /** Get whether the node has children or not. */
-  hasChild = (node: FileNode) => !!node.children && node.children.length > 0;
+  hasChild = (_: number, node: FileNode) => !!node.children && node.children.length > 0;
 }
