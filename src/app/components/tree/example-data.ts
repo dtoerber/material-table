@@ -19,7 +19,7 @@ export const files: FileNode[] = [
             name: 'cdk',
             type: 'folder',
             children: [
-              { name: 'package.json', type: 'file' },
+              { name: 'angular.json', type: 'file' },
               { name: 'BUILD.bazel', type: 'file' },
             ],
           },

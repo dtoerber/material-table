@@ -1,16 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTreeModule } from '@angular/material/tree';
+import { MatTree, MatTreeModule } from '@angular/material/tree';
 import { EXAMPLE_DATA, FileNode, files } from './example-data';
+import { TreeDragService } from './tree-drag.service';
 
 @Component({
   selector: 'app-tree',
   templateUrl: './tree.component.html',
   styleUrl: './tree.component.scss',
-  imports: [MatTreeModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatTreeModule, MatButtonModule, MatIconModule],
 })
-export class TreeComponent {
+export class TreeComponent implements AfterViewInit {
+  @ViewChild('tree', { static: false }) tree!: MatTree<FileNode>;
+
   /** The data source for the tree */
   // dataSource = EXAMPLE_DATA;
   dataSource = files;
@@ -20,4 +24,138 @@ export class TreeComponent {
 
   /** Get whether the node has children or not. */
   hasChild = (_: number, node: FileNode) => !!node.children && node.children.length > 0;
+
+  constructor(public dragService: TreeDragService) {}
+
+  /**
+   * Lifecycle hook that runs after the view is initialized
+   * Expands all nodes in the tree
+   */
+  ngAfterViewInit(): void {
+    this.tree.expandAll();
+  }
+
+  /**
+   * Handle node click event
+   */
+  onNodeClick(event: MouseEvent, node: FileNode): void {
+    // Don't interfere with toggle button clicks
+    if ((event.target as HTMLElement).closest('button[matTreeNodeToggle]')) {
+      return;
+    }
+    this.dragService.setSelected(node);
+  }
+
+  /**
+   * Handle drag start event
+   */
+  onDragStart(event: DragEvent, node: FileNode, parent: FileNode | null, index: number): void {
+    event.stopPropagation();
+    this.dragService.startDrag(node, parent, index, this.dataSource);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', node.name);
+
+      // Create a custom drag image (small icon)
+      const dragIcon = document.createElement('div');
+      dragIcon.style.cssText = `
+        position: absolute;
+        top: -1000px;
+        left: -1000px;
+        width: 40px;
+        height: 40px;
+        background-color: #3f51b5;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      `;
+      dragIcon.textContent = node.type === 'folder' ? '📁' : '📄';
+      document.body.appendChild(dragIcon);
+
+      event.dataTransfer.setDragImage(dragIcon, 20, 20);
+
+      // Clean up the drag icon after a short delay
+      setTimeout(() => {
+        document.body.removeChild(dragIcon);
+      }, 0);
+    }
+  }
+
+  /**
+   * Handle drag over event
+   */
+  onDragOver(event: DragEvent, node: FileNode, element: HTMLElement): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const position = this.dragService.calculateDropPosition(event, element, node);
+
+    if (this.dragService.canDrop(node, position)) {
+      this.dragService.setDropTarget(node, position);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'move';
+      }
+    } else {
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'none';
+      }
+    }
+  }
+
+  /**
+   * Handle drag leave event
+   */
+  onDragLeave(event: DragEvent): void {
+    event.stopPropagation();
+  }
+
+  /**
+   * Handle drop event
+   */
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Perform the drop operation (service handles expansion state)
+    this.dataSource = this.dragService.drop(this.dataSource, this.tree);
+
+    // Restore expanded state after a short delay to allow the tree to render
+    setTimeout(() => {
+      this.dragService.restoreExpandedState(this.tree, this.dataSource);
+    }, 0);
+  }
+
+  /**
+   * Handle drag end event
+   */
+  onDragEnd(event: DragEvent): void {
+    event.stopPropagation();
+    this.dragService.endDrag();
+  }
+
+  /**
+   * Get the parent node for a given node
+   */
+  getParentNode(node: FileNode): FileNode | null {
+    return this.dragService.getParentNode(node, this.dataSource);
+  }
+
+  /**
+   * Get the index of a node within its parent's children array
+   */
+  getNodeIndex(node: FileNode, parent: FileNode | null): number {
+    return this.dragService.getNodeIndex(node, parent, this.dataSource);
+  }
+
+  /**
+   * Get CSS classes for drag state
+   */
+  getDragClasses(node: FileNode): { [key: string]: boolean } {
+    return this.dragService.getDragClasses(node);
+  }
 }
