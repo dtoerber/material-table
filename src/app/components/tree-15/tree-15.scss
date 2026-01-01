@@ -7,7 +7,57 @@
   transition: background-color 0.2s ease;
 
   &.drop-target-root {
-    background-color: rgba(0, 128, 0, 0.1);
+    background-color: rgba(255, 0, 0, 0.1);
+    border-color: red;
+    border-style: dashed;
+  }
+}
+
+// Drag and drop styles
+mat-tree-node {
+  cursor: grab;
+  transition: all 0.2s ease;
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 4px;
+
+  &.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
+
+  &.selected {
+    background-color: rgba(255, 0, 0, 0.15);
+    font-weight: 500;
+  }
+
+  // Drop before indicator
+  &.drop-before::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: red;
+    z-index: 10;
+  }
+
+  // Drop after indicator
+  &.drop-after::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: red;
+    z-index: 10;
+  }
+
+  // Drop inside indicator
+  &.drop-inside {
+    background-color: rgba(255, 0, 0, 0.2);
     border-color: red;
     border-style: dashed;
   }
