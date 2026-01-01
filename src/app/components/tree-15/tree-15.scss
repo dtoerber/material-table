@@ -1,0 +1,14 @@
+.container {
+  width: 33%;
+  min-height: 1000px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 2px solid red;
+  transition: background-color 0.2s ease;
+
+  &.drop-target-root {
+    background-color: rgba(0, 128, 0, 0.1);
+    border-color: red;
+    border-style: dashed;
+  }
+}

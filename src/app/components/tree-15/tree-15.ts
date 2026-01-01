@@ -3,35 +3,7 @@ import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule } from '@angular/material/tree';
-
-/**
- * Food data with nested structure.
- * Each node has a name and an optional list of children.
- */
-interface FoodNode {
-  name: string;
-  children?: FoodNode[];
-}
-
-const TREE_DATA: FoodNode[] = [
-  {
-    name: 'Fruit',
-    children: [{ name: 'Apple' }, { name: 'Banana' }, { name: 'Fruit loops' }],
-  },
-  {
-    name: 'Vegetables',
-    children: [
-      {
-        name: 'Green',
-        children: [{ name: 'Broccoli' }, { name: 'Brussels sprouts' }],
-      },
-      {
-        name: 'Orange',
-        children: [{ name: 'Pumpkins' }, { name: 'Carrots' }],
-      },
-    ],
-  },
-];
+import { FileNode, files } from '../../data/example-data';
 
 /** Flat node with expandable and level information */
 interface ExampleFlatNode {
@@ -40,13 +12,13 @@ interface ExampleFlatNode {
   level: number;
 }
 @Component({
-  selector: 'app-tree-three',
+  selector: 'app-tree-15',
   imports: [MatTreeModule, MatIconModule, MatButtonModule],
-  templateUrl: './tree-three.html',
-  styleUrl: './tree-three.scss',
+  templateUrl: './tree-15.html',
+  styleUrl: './tree-15.scss',
 })
-export class TreeThreeComponent {
-  private _transformer = (node: FoodNode, level: number) => {
+export class Tree15Component {
+  private _transformer = (node: FileNode, level: number) => {
     return {
       expandable: !!node.children && node.children.length > 0,
       name: node.name,
@@ -69,7 +41,7 @@ export class TreeThreeComponent {
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
   constructor() {
-    this.dataSource.data = TREE_DATA;
+    this.dataSource.data = files;
   }
 
   hasChild = (_: number, node: ExampleFlatNode) => node.expandable;
